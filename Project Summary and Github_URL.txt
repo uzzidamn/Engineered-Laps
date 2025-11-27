@@ -1,0 +1,22 @@
+
+https://github.com/uzzidamn/Engineered-Laps
+
+
+
+
+F1 Real-Time Telemetry Streaming Pipeline
+This project implements a production-grade real-time streaming pipeline for Formula 1 telemetry data, demonstrating modern data engineering practices through an event-driven architecture.
+
+Data Acquisition & Processing
+The pipeline extracts historical telemetry from the 2023 Monaco Grand Prix using the FastF1 Python library, capturing approximately 982,330 telemetry data points. This data includes critical race metrics such as speed, RPM, throttle position, brake pressure, gear selection, and DRS status for drivers including Verstappen, Hamilton, and Leclerc.
+
+Streaming Architecture
+At the core of the system is Apache Kafka, serving as a distributed message broker that enables real-time event streaming. The architecture employs three distinct Kafka topics: f1-telemetry (4 partitions for parallel processing), f1-alerts (3 partitions for severity-based routing), and f1-predictions (3 partitions for ML model outputs). This partitioning strategy ensures horizontal scalability and maintains message ordering per driver.
+
+Bridge Service & Visualization
+A Flask-based bridge service consumes Kafka messages and exposes JSON API endpoints for Grafana integration. This bridge performs real-time calculations including wheel spin percentage analysis and gear selection anomaly detection. Grafana dashboards visualize the streaming data with 5-second refresh intervals and sub-100ms end-to-end latency, displaying speed/RPM graphs, throttle/brake metrics, and alert annotations.
+
+Key Capabilities
+The system achieves throughput of approximately 2,200 messages per second while implementing anomaly detection for wheel spin events and gear selection issues. The architecture follows weak scaling principles, allowing the system to scale horizontally by adding more Kafka partitions and consumers as data volume increases.
+Technology Stack
+The pipeline integrates Python (Pandas for caching), Apache Kafka (message streaming), Flask (API bridge), and Grafana (visualization), with YAML-based centralized configuration management—demonstrating a complete end-to-end data engineering solution for real-time motorsport analytics.

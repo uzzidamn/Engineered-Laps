@@ -1,0 +1,38 @@
+# Large data files
+data/*.csv
+data/*.parquet
+
+# Log files
+*.log
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+

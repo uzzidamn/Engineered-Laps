@@ -1,0 +1,84 @@
+# Grafana Kafka Bridge Configuration
+
+bridge:
+  host: "0.0.0.0"
+  port: 5001
+  debug: false
+  
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topics:
+    telemetry: "f1-telemetry"
+    alerts: "f1-alerts"
+  consumer_group: "grafana_bridge"
+  poll_timeout_ms: 100
+  max_messages: 50
+
+buffer:
+  # Maximum number of data points to keep per driver
+  # At ~2000 msg/s, 60000 points = ~30 seconds of data
+  max_points_per_driver: 60000
+  # Maximum number of alerts to keep
+  max_alerts: 500
+  # Time window for metrics calculation (seconds)
+  metrics_window: 60
+  
+telemetry:
+  # Fields to extract from Kafka messages
+  fields:
+    - speed
+    - rpm
+    - throttle
+    - brake
+    - gear
+    - drs
+    - n_gear
+  
+  # Derived metrics to calculate
+  derived_metrics:
+    wheel_spin:
+      enabled: true
+      threshold: 1.15  # 15% threshold for wheel spin detection
+      gear_ratios:
+        1: 13.0
+        2: 10.5
+        3: 8.5
+        4: 7.0
+        5: 6.0
+        6: 5.2
+        7: 4.5
+        8: 4.0
+      wheel_radius_m: 0.33
+    
+    gear_anomalies:
+      enabled: true
+      lugging_threshold: 2
+      over_rev_threshold: 2
+      rapid_shift_changes: 3
+      rapid_shift_window: 2.0
+
+alerts:
+  # Alert severity levels
+  severity_levels:
+    - high
+    - medium
+    - low
+  
+  # Alert retention period (seconds)
+  retention_period: 3600
+
+grafana:
+  # Response format settings
+  datetime_format: "iso"
+  null_value_handling: "drop"  # or "zero", "interpolate"
+  
+  # Query optimization
+  max_datapoints: 1000
+  enable_caching: true
+  cache_ttl_seconds: 5
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/grafana_bridge.log"
+

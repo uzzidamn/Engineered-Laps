@@ -1,0 +1,104 @@
+# Grafana Installation Instructions for F1 Streaming Pipeline
+
+## IMPORTANT: Manual Installation Required
+
+Due to Homebrew permission issues in your environment, Grafana needs to be installed manually.
+
+## Option 1: Fix Homebrew Permissions (Recommended)
+
+Run this command to fix Homebrew permissions:
+
+```bash
+sudo chown -R $(whoami) /opt/homebrew/Cellar
+```
+
+Then install Grafana:
+
+```bash
+brew install grafana
+brew services start grafana
+```
+
+## Option 2: Direct Download (Alternative)
+
+1. Download Grafana for macOS from:
+   https://grafana.com/grafana/download?platform=mac
+
+2. Install the downloaded package:
+   - If .dmg: Open and drag Grafana to Applications
+   - If .tar.gz: Extract and run: ./bin/grafana-server
+
+3. Start Grafana:
+   ```bash
+   # If installed to Applications
+   open /Applications/Grafana.app
+   
+   # Or if extracted manually
+   cd grafana-10.x.x
+   ./bin/grafana-server
+   ```
+
+## Option 3: Docker (Easiest)
+
+```bash
+docker run -d \
+  -p 3000:3000 \
+  --name=grafana \
+  -v "$PWD/grafana/provisioning:/etc/grafana/provisioning" \
+  -v "$PWD/grafana/dashboards:/var/lib/grafana/dashboards" \
+  grafana/grafana-oss:latest
+```
+
+## After Installing Grafana
+
+1. Access Grafana at: http://localhost:3000
+   - Username: admin
+   - Password: admin
+   - Change password when prompted
+
+2. Install JSON API plugin:
+   ```bash
+   # If using Homebrew
+   grafana-cli plugins install grafana-simple-json-datasource
+   brew services restart grafana
+   
+   # If using Docker
+   docker exec -it grafana grafana-cli plugins install grafana-simple-json-datasource
+   docker restart grafana
+   ```
+
+3. Start the Kafka Bridge Service:
+   ```bash
+   # Make sure Kafka is running
+   ./scripts/start_kafka.sh
+   
+   # Start the bridge
+   ./scripts/start_grafana_bridge.sh
+   ```
+
+4. Follow the complete setup guide:
+   See docs/GRAFANA_SETUP.md
+
+## Verification
+
+After installation, verify everything is working:
+
+```bash
+# 1. Check Grafana is accessible
+curl http://localhost:3000
+
+# 2. Check bridge is running
+curl http://localhost:5001/stats
+
+# 3. Check Kafka is running
+nc -z localhost 9092 && echo "Kafka OK" || echo "Kafka not running"
+```
+
+## Need Help?
+
+Refer to the comprehensive documentation:
+- docs/GRAFANA_SETUP.md - Complete setup guide
+- docs/GRAFANA_DASHBOARD_GUIDE.md - How to use the dashboard
+
+All the code and configuration files are ready - you just need to install Grafana itself!
+

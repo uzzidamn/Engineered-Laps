@@ -1,0 +1,17 @@
+# Grafana Dashboard Provisioning
+# Auto-load F1 Real-Time Telemetry Dashboard
+
+apiVersion: 1
+
+providers:
+  - name: 'F1 Dashboards'
+    orgId: 1
+    folder: 'F1 Racing'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /Users/Ujjwal/Documents/DE Project/f1_streaming_pipeline/grafana/dashboards
+      foldersFromFilesStructure: true
+

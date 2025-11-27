@@ -1,0 +1,17 @@
+# Grafana Datasource Provisioning
+# Auto-configure F1 Kafka Bridge datasource
+
+apiVersion: 1
+
+datasources:
+  - name: F1 Kafka Bridge
+    type: grafana-simple-json-datasource
+    uid: bf57jef14tji8b
+    access: proxy
+    url: http://localhost:5001
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: "1s"
+    version: 1
+

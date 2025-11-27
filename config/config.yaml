@@ -1,0 +1,68 @@
+# F1 Real-Time Telemetry Streaming Pipeline Configuration
+
+race:
+  year: 2020
+  grand_prix: "Bahrain Grand Prix"
+  session: "Race"
+
+
+kafka:
+  bootstrap_servers: "localhost:9092"
+  topic_name: "f1-speed-stream"  # Legacy topic name (kept for backward compatibility)
+  # New topic structure
+  topics:
+    telemetry: "f1-telemetry"
+    alerts: "f1-alerts"
+    predictions: "f1-predictions"
+  partitions:
+    telemetry: 4  # Will be partitioned by driver_id (hash-based)
+    alerts: 3  # Partitioned by severity (high/medium/low)
+    predictions: 3  # Partitioned by model_type
+  replication_factor: 1
+  consumer_groups:
+    streamlit_anomalies: "streamlit-anomalies-group"
+    streamlit_wheel_spin: "streamlit-wheel-spin-group"
+    streamlit_gear_anomalies: "streamlit-gear-anomalies-group"
+    alert_processor: "alert-processor-group"
+    ml_inference: "ml-inference-group"
+    notebook_monitor: "notebook-monitor-group"
+    grafana_bridge: "grafana-bridge-group"
+  partitioning:
+    telemetry_key: "driver_id"  # Use driver_id as message key
+    alert_key: "alert_id"  # Use alert_id (UUID) as message key
+    prediction_key: "model_type"  # Use model_type as message key
+
+data:
+  input_format: "fastf1"  # or "csv", "parquet"
+  output_format: "csv"     # or "parquet", "both"
+  cache_type: "memory"
+  data_dir: "data/"
+
+ml:
+  models_dir: "models/"
+  inference_latency_threshold_ms: 10
+  model_types:
+    - crash_risk
+    - tire_failure
+    - pit_stop_probability
+
+dashboard:
+  refresh_interval_ms: 50  # Match FastF1 frequency (10-20 Hz)
+  update_frequency: "real_time"
+  port: 8501
+
+grafana:
+  enabled: true
+  bridge_port: 5001
+  bridge_host: "0.0.0.0"
+  dashboard_refresh_seconds: 1
+  data_retention_points: 1000
+
+scaling:
+  scenarios: [2, 4, 8, 16]  # Number of consumers/partitions for weak scaling demo
+  duration_per_scenario: 300  # seconds
+
+logging:
+  level: "INFO"
+  log_file: "logs/pipeline.log"
+
